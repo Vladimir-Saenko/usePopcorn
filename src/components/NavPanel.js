@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function NavPanel({ movies }) {
+export default function NavPanel({ children }) {
   const [query, setQuery] = useState("");
 
   return (
@@ -16,9 +16,7 @@ export default function NavPanel({ movies }) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
-      <p className="num-results">
-        Found <strong>{movies.length}</strong> results
-      </p>
+      {children}
     </nav>
   );
 }

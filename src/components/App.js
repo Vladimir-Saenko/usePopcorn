@@ -1,7 +1,9 @@
 import { useState } from "react";
 import NavPanel from "./NavPanel";
-import MoviesList from "./MoviesList";
-import WatchedList from "./WatchedList";
+import MoviesListBox from "./MoviesListBox";
+import SearchedMovies from "./SearchedMovies";
+import WatchedMovies from "./WatchedMovies";
+import WatchedSummary from "./WatchedSummary";
 
 const tempMovieData = [
   {
@@ -56,13 +58,28 @@ export default function App() {
 
   return (
     <>
-      <NavPanel movies={movies} />
+      <NavPanel>
+        <Results movies={movies} />
+      </NavPanel>
 
       <main className="main">
-        <MoviesList movies={movies} />
+        <MoviesListBox>
+          <SearchedMovies movies={movies} />
+        </MoviesListBox>
 
-        <WatchedList watched={watched} />
+        <MoviesListBox>
+          <WatchedSummary movies={watched} />
+          <WatchedMovies movies={watched} />
+        </MoviesListBox>
       </main>
     </>
+  );
+}
+
+function Results({ movies }) {
+  return (
+    <p className="num-results">
+      Found <strong>{movies.length}</strong> results
+    </p>
   );
 }
