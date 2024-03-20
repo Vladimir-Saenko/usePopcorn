@@ -5,6 +5,7 @@ import SearchedMovies from "./SearchedMovies";
 import WatchedMovies from "./WatchedMovies";
 import WatchedSummary from "./WatchedSummary";
 import Loader from "./Loader";
+import SelectedMovie from "./SelectedMovie";
 
 const tempMovieData = [
   {
@@ -61,7 +62,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("putin");
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedId, setSelectedId] = useState("tt6840134");
 
   useEffect(
     function () {
@@ -97,6 +98,11 @@ export default function App() {
     [query]
   );
 
+  function handleSelectMovie(id) {
+    // id === selectedId ? setSelectedId(null) : setSelectedId(id);
+    setSelectedId(id === selectedId ? null : id);
+  }
+
   return (
     <>
       <NavPanel query={query} setQuery={setQuery}>
@@ -106,13 +112,21 @@ export default function App() {
       <main className="main">
         <MoviesListBox>
           {error && <ErrorMessage message={error} />}
-          {!isLoading && !error && <SearchedMovies movies={movies} />}
+          {!isLoading && !error && (
+            <SearchedMovies movies={movies} onSelectMovie={handleSelectMovie} />
+          )}
           {isLoading && <Loader />}
         </MoviesListBox>
 
         <MoviesListBox>
-          <WatchedSummary movies={watched} />
-          <WatchedMovies movies={watched} />
+          {selectedId ? (
+            <SelectedMovie selectedId={selectedId} />
+          ) : (
+            <>
+              <WatchedSummary movies={watched} />
+              <WatchedMovies movies={watched} />{" "}
+            </>
+          )}
         </MoviesListBox>
       </main>
     </>
