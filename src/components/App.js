@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NavPanel from "./NavPanel";
 import MoviesListBox from "./MoviesListBox";
 import SearchedMovies from "./SearchedMovies";
 import WatchedMovies from "./WatchedMovies";
 import WatchedSummary from "./WatchedSummary";
+import Loader from "./Loader";
 
 const tempMovieData = [
   {
@@ -52,19 +53,61 @@ const tempWatchedData = [
   },
 ];
 
+const omdbKey = "a45ffb1e"; //Ключ доступа к API omdbapi.com
+
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
+  const [movies, setMovies] = useState([]);
+  const [watched, setWatched] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [query, setQuery] = useState("putin");
+  const [selectedId, setSelectedId] = useState(null);
+
+  useEffect(
+    function () {
+      async function fetchMovies() {
+        try {
+          setIsLoading(true);
+          setError("");
+          const res = await fetch(
+            `http://www.omdbapi.com/?apikey=${omdbKey}&s=${query}`
+          );
+
+          if (!res.ok) throw new Error("Ошибка запроса к серверу");
+
+          const data = await res.json();
+
+          if (data.Response === "False") throw new Error("Фильмы не найдены!");
+
+          setMovies(data.Search);
+          setIsLoading(false);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+      if (query.length < 3) {
+        setMovies([]);
+        setError("");
+        return;
+      }
+      fetchMovies();
+    },
+    [query]
+  );
 
   return (
     <>
-      <NavPanel>
+      <NavPanel query={query} setQuery={setQuery}>
         <Results movies={movies} />
       </NavPanel>
 
       <main className="main">
         <MoviesListBox>
-          <SearchedMovies movies={movies} />
+          {error && <ErrorMessage message={error} />}
+          {!isLoading && !error && <SearchedMovies movies={movies} />}
+          {isLoading && <Loader />}
         </MoviesListBox>
 
         <MoviesListBox>
@@ -79,7 +122,16 @@ export default function App() {
 function Results({ movies }) {
   return (
     <p className="num-results">
-      Found <strong>{movies.length}</strong> results
+      Found <strong>{movies ? movies.length : 0}</strong> results
+    </p>
+  );
+}
+
+function ErrorMessage({ message }) {
+  return (
+    <p className="error">
+      <span>🚫</span>
+      {message}
     </p>
   );
 }
