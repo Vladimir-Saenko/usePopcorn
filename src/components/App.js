@@ -103,6 +103,10 @@ export default function App() {
     setSelectedId(id === selectedId ? null : id);
   }
 
+  function handleAddWatched(movie) {
+    setWatched((watched) => [...watched, movie]);
+  }
+
   return (
     <>
       <NavPanel query={query} setQuery={setQuery}>
@@ -120,7 +124,7 @@ export default function App() {
 
         <MoviesListBox>
           {selectedId ? (
-            <SelectedMovie selectedId={selectedId} />
+            <SelectedMovie omdbKey={omdbKey} selectedId={selectedId} />
           ) : (
             <>
               <WatchedSummary movies={watched} />
