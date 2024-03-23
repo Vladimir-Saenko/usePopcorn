@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
 const containerStyle = {
@@ -37,12 +37,14 @@ export default function StarRating({
     fontSize: `${size}px`,
   };
 
+  useEffect(() => {
+    setRating(defaultRating);
+  }, [defaultRating]);
+
   function handleSetRating(newRating) {
     setRating(newRating);
     onSetRating(newRating);
   }
-
-  console.log(defaultRating);
 
   return (
     <div style={containerStyle} className={className}>

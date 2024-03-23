@@ -107,6 +107,16 @@ export default function App() {
     setWatched((watched) => [...watched, movie]);
   }
 
+  function handleChangeRating(movie) {
+    setWatched(
+      watched.map((item) =>
+        item.imdbID === movie.imdbID
+          ? { ...item, userRating: movie.userRating }
+          : item
+      )
+    );
+  }
+
   return (
     <>
       <NavPanel query={query} setQuery={setQuery}>
@@ -124,7 +134,13 @@ export default function App() {
 
         <MoviesListBox>
           {selectedId ? (
-            <SelectedMovie omdbKey={omdbKey} selectedId={selectedId} />
+            <SelectedMovie
+              omdbKey={omdbKey}
+              selectedId={selectedId}
+              onAddWatched={handleAddWatched}
+              watched={watched}
+              onChangeRating={handleChangeRating}
+            />
           ) : (
             <>
               <WatchedSummary movies={watched} />

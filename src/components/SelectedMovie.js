@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import StarRating from "./StarRating";
 
-export default function SelectedMovie({ selectedId, omdbKey, onSetRating }) {
+export default function SelectedMovie({
+  selectedId,
+  omdbKey,
+  onAddWatched,
+  watched,
+  onChangeRating,
+}) {
   const [movie, setMovie] = useState({});
 
   const {
@@ -17,6 +23,9 @@ export default function SelectedMovie({ selectedId, omdbKey, onSetRating }) {
     Genre: genre,
   } = movie;
 
+  const [myRating, setMyRaiting] = useState(0);
+  const [watchedRating, setWatchedRating] = useState(0);
+
   useEffect(
     function () {
       async function getMovieDetails() {
@@ -25,13 +34,39 @@ export default function SelectedMovie({ selectedId, omdbKey, onSetRating }) {
         );
         const data = await res.json();
         setMovie(data);
+        const defRating = watched.find((movie) => movie.imdbID === selectedId)
+          ? movie.userRating
+          : 0;
+        setWatchedRating(defRating);
+
+        console.log(defRating);
       }
       getMovieDetails();
     },
-    [selectedId]
+    [selectedId, omdbKey]
   );
 
-  //console.log(imdbRating);
+  function handleAdd() {
+    const newWatchedMovie = {
+      imdbID: selectedId,
+      title,
+      year,
+      poster,
+      imdbRating: Number(imdbRating),
+      runtime: Number(runtime.split(" ").at(0)),
+      userRating: myRating,
+    };
+
+    onAddWatched(newWatchedMovie);
+  }
+
+  function handleChange() {
+    const movie = {
+      imdbID: selectedId,
+      userRating: myRating,
+    };
+    onChangeRating(movie);
+  }
 
   return (
     <div className="details">
@@ -53,9 +88,22 @@ export default function SelectedMovie({ selectedId, omdbKey, onSetRating }) {
           <StarRating
             maxRating={10}
             size={24}
-            defaultRating={Math.round(imdbRating)}
-            onSetRating={onSetRating}
+            defaultRating={
+              watchedRating > 0 ? watchedRating : Math.round(imdbRating)
+            }
+            onSetRating={setMyRaiting}
           />
+          {watchedRating < 1 ? (
+            myRating > 0 && (
+              <button className="btn-add" onClick={handleAdd}>
+                Добавить в список
+              </button>
+            )
+          ) : (
+            <button className="btn-add" onClick={handleChange}>
+              Изменить рейтинг
+            </button>
+          )}
         </div>
         <p>
           <em>{plot}</em>
