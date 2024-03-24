@@ -90,7 +90,7 @@ export default function SelectedMovie({
             defaultRating={watchedUserRating > 0 ? watchedUserRating : null}
             onSetRating={setMyRaiting}
           />
-          {myRating > 0 ? (
+          {(myRating > 0) & !watchedUserRating ? (
             <button className="btn-add" onClick={handleAdd}>
               Добавить в список
             </button>

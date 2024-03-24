@@ -117,6 +117,10 @@ export default function App() {
     );
   }
 
+  function handleDeleteMovie(id) {
+    setWatched((watched) => watched.filter((item) => item.imdbID !== id));
+  }
+
   return (
     <>
       <NavPanel query={query} setQuery={setQuery}>
@@ -144,7 +148,10 @@ export default function App() {
           ) : (
             <>
               <WatchedSummary movies={watched} />
-              <WatchedMovies movies={watched} />{" "}
+              <WatchedMovies
+                movies={watched}
+                onDeleteMovie={handleDeleteMovie}
+              />{" "}
             </>
           )}
         </MoviesListBox>
