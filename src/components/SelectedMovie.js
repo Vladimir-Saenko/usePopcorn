@@ -24,7 +24,10 @@ export default function SelectedMovie({
   } = movie;
 
   const [myRating, setMyRaiting] = useState(0);
-  const [watchedRating, setWatchedRating] = useState(0);
+
+  const watchedUserRating = watched.find(
+    (movie) => movie.imdbID === selectedId
+  )?.userRating;
 
   useEffect(
     function () {
@@ -34,14 +37,9 @@ export default function SelectedMovie({
         );
         const data = await res.json();
         setMovie(data);
-        const defRating = watched.find((movie) => movie.imdbID === selectedId)
-          ? movie.userRating
-          : 0;
-        setWatchedRating(defRating);
-
-        console.log(defRating);
       }
       getMovieDetails();
+      setMyRaiting(0);
     },
     [selectedId, omdbKey]
   );
@@ -58,6 +56,7 @@ export default function SelectedMovie({
     };
 
     onAddWatched(newWatchedMovie);
+    setMyRaiting(0);
   }
 
   function handleChange() {
@@ -88,22 +87,18 @@ export default function SelectedMovie({
           <StarRating
             maxRating={10}
             size={24}
-            defaultRating={
-              watchedRating > 0 ? watchedRating : Math.round(imdbRating)
-            }
+            defaultRating={watchedUserRating > 0 ? watchedUserRating : null}
             onSetRating={setMyRaiting}
           />
-          {watchedRating < 1 ? (
-            myRating > 0 && (
-              <button className="btn-add" onClick={handleAdd}>
-                Добавить в список
-              </button>
-            )
-          ) : (
+          {myRating > 0 ? (
+            <button className="btn-add" onClick={handleAdd}>
+              Добавить в список
+            </button>
+          ) : watchedUserRating ? (
             <button className="btn-add" onClick={handleChange}>
               Изменить рейтинг
             </button>
-          )}
+          ) : null}
         </div>
         <p>
           <em>{plot}</em>
