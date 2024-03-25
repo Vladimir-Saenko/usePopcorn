@@ -7,7 +7,7 @@ import WatchedSummary from "./WatchedSummary";
 import Loader from "./Loader";
 import SelectedMovie from "./SelectedMovie";
 
-const tempMovieData = [
+/*const tempMovieData = [
   {
     imdbID: "tt1375666",
     Title: "Inception",
@@ -52,7 +52,7 @@ const tempWatchedData = [
     imdbRating: 8.5,
     userRating: 9,
   },
-];
+]; */
 
 const omdbKey = "a45ffb1e"; //Ключ доступа к API omdbapi.com
 
@@ -61,17 +61,19 @@ export default function App() {
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [query, setQuery] = useState("putin");
-  const [selectedId, setSelectedId] = useState("tt6840134");
+  const [query, setQuery] = useState("");
+  const [selectedId, setSelectedId] = useState("");
 
   useEffect(
     function () {
+      const controller = new AbortController();
       async function fetchMovies() {
         try {
           setIsLoading(true);
           setError("");
           const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${omdbKey}&s=${query}`
+            `http://www.omdbapi.com/?apikey=${omdbKey}&s=${query}`,
+            { signal: controller.signal }
           );
 
           if (!res.ok) throw new Error("Ошибка запроса к серверу");
@@ -82,8 +84,9 @@ export default function App() {
 
           setMovies(data.Search);
           setIsLoading(false);
+          setError("");
         } catch (err) {
-          setError(err.message);
+          if (err.name !== "AbortError") setError(err.message);
         } finally {
           setIsLoading(false);
         }
@@ -93,7 +96,10 @@ export default function App() {
         setError("");
         return;
       }
+      handleCloseDetails();
       fetchMovies();
+
+      return () => controller.abort();
     },
     [query]
   );
@@ -101,6 +107,10 @@ export default function App() {
   function handleSelectMovie(id) {
     // id === selectedId ? setSelectedId(null) : setSelectedId(id);
     setSelectedId(id === selectedId ? null : id);
+  }
+
+  function handleCloseDetails() {
+    setSelectedId(null);
   }
 
   function handleAddWatched(movie) {
@@ -144,6 +154,7 @@ export default function App() {
               onAddWatched={handleAddWatched}
               watched={watched}
               onChangeRating={handleChangeRating}
+              onCloseDetails={handleCloseDetails}
             />
           ) : (
             <>

@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 export default function NavPanel({ children, query, setQuery }) {
   return (
     <nav className="nav-bar">

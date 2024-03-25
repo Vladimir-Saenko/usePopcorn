@@ -7,6 +7,7 @@ export default function SelectedMovie({
   onAddWatched,
   watched,
   onChangeRating,
+  onCloseDetails,
 }) {
   const [movie, setMovie] = useState({});
 
@@ -42,6 +43,28 @@ export default function SelectedMovie({
       setMyRaiting(0);
     },
     [selectedId, omdbKey]
+  );
+
+  useEffect(() => {
+    if (!title) return;
+    document.title = "usePopcorn: " + title;
+
+    return () => (document.title = "usePopcorn"); // Cleanup/очистка после Эффекта
+  }, [title]);
+
+  useEffect(
+    function () {
+      function Callback(e) {
+        if (e.code === "Escape") {
+          onCloseDetails();
+        }
+      }
+
+      document.addEventListener("keydown", Callback);
+
+      return () => document.removeEventListener("keydown", Callback); // очистка
+    },
+    [onCloseDetails]
   );
 
   function handleAdd() {
