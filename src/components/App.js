@@ -19,9 +19,37 @@ export default function App() {
 
   const [watched, setWatched] = useState(function () {
     const stored = localStorage.getItem("watched");
-    return stored ? JSON.parse(stored) : [];
+    return JSON.parse(stored);
   });
 
+  function handleSelectMovie(id) {
+    // id === selectedId ? setSelectedId(null) : setSelectedId(id);
+    setSelectedId(id === selectedId ? null : id);
+  }
+
+  function handleCloseDetails() {
+    setSelectedId(null);
+  }
+
+  function handleAddWatched(movie) {
+    setWatched((watched) => [...watched, movie]);
+
+    //localStorage("watched", JSON.stringify([...watched, movie]));
+  }
+
+  function handleChangeRating(movie) {
+    setWatched(
+      watched.map((item) =>
+        item.imdbID === movie.imdbID
+          ? { ...item, userRating: movie.userRating }
+          : item
+      )
+    );
+  }
+
+  function handleDeleteMovie(id) {
+    setWatched((watched) => watched.filter((item) => item.imdbID !== id));
+  }
   useEffect(
     function () {
       const controller = new AbortController();
@@ -68,35 +96,6 @@ export default function App() {
     },
     [watched]
   );
-
-  function handleSelectMovie(id) {
-    // id === selectedId ? setSelectedId(null) : setSelectedId(id);
-    setSelectedId(id === selectedId ? null : id);
-  }
-
-  function handleCloseDetails() {
-    setSelectedId(null);
-  }
-
-  function handleAddWatched(movie) {
-    setWatched((watched) => [...watched, movie]);
-
-    //localStorage("watched", JSON.stringify([...watched, movie]));
-  }
-
-  function handleChangeRating(movie) {
-    setWatched(
-      watched.map((item) =>
-        item.imdbID === movie.imdbID
-          ? { ...item, userRating: movie.userRating }
-          : item
-      )
-    );
-  }
-
-  function handleDeleteMovie(id) {
-    setWatched((watched) => watched.filter((item) => item.imdbID !== id));
-  }
 
   return (
     <>
