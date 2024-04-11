@@ -1,7 +1,14 @@
 import { useEffect, useRef } from "react";
+import { useKey } from "./useKey";
 
 export default function NavPanel({ children, query, setQuery }) {
   const inputEl = useRef(null);
+
+  useKey("Enter", function () {
+    if (document.activeElement === inputEl.current) return;
+    setQuery("");
+    inputEl.current.focus();
+  });
 
   useEffect(
     function () {

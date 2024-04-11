@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
+import { useKey } from "./useKey";
 
 export default function SelectedMovie({
   selectedId,
@@ -62,20 +63,7 @@ export default function SelectedMovie({
     return () => (document.title = "usePopcorn"); // Cleanup/очистка после Эффекта
   }, [title]);
 
-  useEffect(
-    function () {
-      function Callback(e) {
-        if (e.code === "Escape") {
-          onCloseDetails();
-        }
-      }
-
-      document.addEventListener("keydown", Callback);
-
-      return () => document.removeEventListener("keydown", Callback); // очистка
-    },
-    [onCloseDetails]
-  );
+  useKey("Escape", onCloseDetails);
 
   function handleAdd() {
     const newWatchedMovie = {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import NavPanel from "./NavPanel";
 import MoviesListBox from "./MoviesListBox";
 import SearchedMovies from "./SearchedMovies";
@@ -7,16 +7,15 @@ import WatchedSummary from "./WatchedSummary";
 import Loader from "./Loader";
 import SelectedMovie from "./SelectedMovie";
 import { useMovies } from "./useMovies";
+import { useLocalStorageState } from "./useLocalStorageState";
 
 const omdbKey = "a45ffb1e"; //Ключ доступа к API omdbapi.com
 
 export default function App() {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
-  const [watched, setWatched] = useState(function () {
-    const stored = localStorage.getItem("watched");
-    return JSON.parse(stored);
-  });
+
+  const [watched, setWatched] = useLocalStorageState([], "watched");
 
   function handleSelectMovie(id) {
     // id === selectedId ? setSelectedId(null) : setSelectedId(id);
@@ -48,13 +47,6 @@ export default function App() {
   function handleDeleteMovie(id) {
     setWatched((watched) => watched.filter((item) => item.imdbID !== id));
   }
-
-  useEffect(
-    function () {
-      localStorage.setItem("watched", JSON.stringify(watched));
-    },
-    [watched]
-  );
 
   return (
     <>
