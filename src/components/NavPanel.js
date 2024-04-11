@@ -12,8 +12,8 @@ export default function NavPanel({ children, query, setQuery }) {
         }
       }
 
-      // document.addEventListener("keypress", callback);
-      return () => document.addEventListener("keypress", callback);
+      document.addEventListener("keypress", callback);
+      return () => document.removeEventListener("keypress", callback); //очистка прослушки
     },
     [setQuery]
   );

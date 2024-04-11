@@ -6,17 +6,13 @@ import WatchedMovies from "./WatchedMovies";
 import WatchedSummary from "./WatchedSummary";
 import Loader from "./Loader";
 import SelectedMovie from "./SelectedMovie";
+import { useMovies } from "./useMovies";
 
 const omdbKey = "a45ffb1e"; //Ключ доступа к API omdbapi.com
 
 export default function App() {
-  const [movies, setMovies] = useState([]);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [query, setQuery] = useState("");
-  const [selectedId, setSelectedId] = useState("");
-
+  const [selectedId, setSelectedId] = useState(null);
   const [watched, setWatched] = useState(function () {
     const stored = localStorage.getItem("watched");
     return JSON.parse(stored);
@@ -30,6 +26,8 @@ export default function App() {
   function handleCloseDetails() {
     setSelectedId(null);
   }
+
+  const { movies, isLoading, error } = useMovies(query);
 
   function handleAddWatched(movie) {
     setWatched((watched) => [...watched, movie]);
@@ -50,45 +48,6 @@ export default function App() {
   function handleDeleteMovie(id) {
     setWatched((watched) => watched.filter((item) => item.imdbID !== id));
   }
-  useEffect(
-    function () {
-      const controller = new AbortController();
-      async function fetchMovies() {
-        try {
-          setIsLoading(true);
-          setError("");
-          const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${omdbKey}&s=${query}`,
-            { signal: controller.signal }
-          );
-
-          if (!res.ok) throw new Error("Ошибка запроса к серверу");
-
-          const data = await res.json();
-
-          if (data.Response === "False") throw new Error("Фильмы не найдены!");
-
-          setMovies(data.Search);
-          setIsLoading(false);
-          setError("");
-        } catch (err) {
-          if (err.name !== "AbortError") setError(err.message);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-      if (query.length < 3) {
-        setMovies([]);
-        setError("");
-        return;
-      }
-      handleCloseDetails();
-      fetchMovies();
-
-      return () => controller.abort();
-    },
-    [query]
-  );
 
   useEffect(
     function () {
